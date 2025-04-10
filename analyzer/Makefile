@@ -1,19 +1,26 @@
-C++	=	g++ -std=c++17
-CFLAGS	=	-g -Wall -Wextra -std=c++17 -Iinclude
+C++	=	g++
+CFLAGS	=	-g3 -Wall -Wextra -Werror -std=c++17 -Iinclude
 LDFLAGS	=
-SRC = &(wildcard *.cpp scanner/*.cpp utils/*.cpp)
+SRC = $(wildcard *.cpp scanner/*.cpp utils/*.cpp report/*.cpp)
 OBJ = $(SRC:.cpp=.o)
+TARGET = analyzer
 
-analyzer: $(OBJ)
-	$(C++) $(LDFLAGS) -o $@ $^ $(LDFLAGS)
-	@echo "Build complete."
+# Règle principale
+all: $(TARGET)
+
+$(TARGET): $(OBJ)
+	$(C++) $(LDFLAGS) $(CFLAGS) -o $@ $^
+	@echo "Building complete."
 
 clean:
-	rm -f analyzer *.o scanner/*.o utils/*.o
+	rm -f $(OBJ)
 	@echo "Clean complete."
 
 fclean: clean
-	rm -f $(OBJ) analyzer
+	rm -f $(TARGET)
 	@echo "Full clean complete."
 
-.PHONY: all clean fclean
+re: fclean all
+	@echo "Rebuild complete."
+
+.PHONY: all clean fclean re

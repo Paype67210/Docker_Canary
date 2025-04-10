@@ -43,7 +43,7 @@ std::vector<std::string> PackagesScanner::scan(const std::string& rootPath) {
         std::ifstream dpkgFile(dpkgPath);
         std::string line;
         while (std::getline(dpkgFile, line)) {
-            if (line.starts_with("Package:")) {
+            if (line.rfind("Package:", 0) == 0) {
                 if (containsSensitivePackage(line, reason)) {
                     findings.push_back("📦 " + reason);
                 }

@@ -1,5 +1,5 @@
 C++	=	g++
-CFLAGS	=	-g3 -Wall -Wextra -Werror -std=c++17 -Iinclude
+# CFLAGS	=	-g3 -Wall -Wextra -Werror -std=c++17 -Iinclude
 LDFLAGS	=
 SRC = $(wildcard *.cpp scanner/*.cpp utils/*.cpp report/*.cpp)
 OBJ = $(SRC:.cpp=.o)

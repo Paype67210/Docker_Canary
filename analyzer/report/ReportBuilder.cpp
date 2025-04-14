@@ -1,5 +1,9 @@
 #include "ReportBuilder.hpp"
 #include <sstream>
+#include "../scanner/BinariesScanner.hpp" // Ensure this header defines BinaryInfo
+#include "../scanner/PackagesScanner.hpp" // Ensure this header defines PackageInfo
+#include "../scanner/LargeFilesScanner.hpp" // Ensure this header defines LargeFileInfo
+#include "../scanner/SecretsScanner.hpp" // Ensure this header defines SecretInfo
 
 void ReportBuilder::addSection(const std::string& name, const std::vector<std::string>& findings) {
     sections[name] = findings;
@@ -42,36 +46,36 @@ int ReportBuilder::computeGlobalScore() const {
     return 20;
 }
 
-// ReportBuilder ReportBuilder::fromScanners(const std::vector<SecretInfo>& secrets,
-//     const std::vector<BinaryInfo>& binaries,
-//     const std::vector<PackageInfo>& packages,
-//     const std::vector<LargeFileInfo>& largeFiles)
-// {
-//     ReportBuilder builder;
+ReportBuilder ReportBuilder::fromScanners(const std::vector<SecretInfo>& secrets,
+    const std::vector<BinariesInfos>& binaries,
+    const std::vector<PackageInfo>& packages,
+    const std::vector<LargeFileInfo>& largeFiles)
+{
+    ReportBuilder builder;
 
-//     std::vector<std::string> secretFindings;
-//     for (const auto& s : secrets) {
-//     secretFindings.push_back(s.path + ":" + std::to_string(s.line) + " => " + s.content);
-//     }
-//     builder.addSection("Secrets", secretFindings);
+    std::vector<std::string> secretFindings;
+    for (const auto& s : secrets) {
+        secretFindings.push_back(s.path + ":" + s.line + " => " + s.content);
+    }
+    builder.addSection("Secrets", secretFindings);
 
-//     std::vector<std::string> binaryFindings;
-//     for (const auto& b : binaries) {
-//     binaryFindings.push_back(b.path + " (arch: " + b.architecture + ", stripped: " + (b.isStripped ? "yes" : "no") + ")");
-//     }
-//     builder.addSection("Suspicious Binaries", binaryFindings);
+    std::vector<std::string> binaryFindings;
+    for (const auto& b : binaries) {
+        binaryFindings.push_back(b.path + " (arch: " + b.architecture + ", stripped: " + (b.isStripped ? "yes" : "no") + ")");
+    }
+    builder.addSection("Suspicious Binaries", binaryFindings);
 
-//     std::vector<std::string> packageFindings;
-//     for (const auto& p : packages) {
-//     packageFindings.push_back(p.name + " - " + p.version);
-//     }
-//     builder.addSection("Packages", packageFindings);
+    std::vector<std::string> packageFindings;
+    for (const auto& p : packages) {
+        packageFindings.push_back(p.name + " - " + p.version);
+    }
+    builder.addSection("Packages", packageFindings);
 
-//     std::vector<std::string> largeFileFindings;
-//     for (const auto& f : largeFiles) {
-//     largeFileFindings.push_back(f.path + " (" + std::to_string(f.size) + " bytes)");
-//     }
-//     builder.addSection("Large Files", largeFileFindings);
+    std::vector<std::string> largeFileFindings;
+    for (const auto& f : largeFiles) {
+        largeFileFindings.push_back(f.path + " (" + std::to_string(f.size) + " bytes)");
+    }
+    builder.addSection("Large Files", largeFileFindings);
 
-//     return builder;
-// }
+    return builder;
+}

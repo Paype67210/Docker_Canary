@@ -4,9 +4,14 @@
 #include <string>
 #include <vector>
 
+struct PackageInfo {
+    std::string name;
+    std::string version;
+};
+
 class PackagesScanner {
 public:
-    static std::vector<std::string> scan(const std::string& rootPath);
+    static std::vector<PackageInfo> scan(const std::string& rootPath);
 };
 
 #endif

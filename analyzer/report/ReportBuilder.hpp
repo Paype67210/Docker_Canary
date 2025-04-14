@@ -8,7 +8,7 @@
 #include "../scanner/SecretsScanner.hpp"
 #include "../scanner/BinariesScanner.hpp"
 #include "../scanner/PackagesScanner.hpp"
-// #include "../scanner/LargeFileScanner.hpp"
+#include "../scanner/LargeFilesScanner.hpp"
 
 class ReportBuilder {
 public:
@@ -16,10 +16,10 @@ public:
     std::string toJson(int indent = 4) const;
     int computeGlobalScore() const; // 100 = safe, 0 = critical
 
-    // static ReportBuilder fromScanners(const std::vector<SecretInfo>& secrets,
-    //                                   const std::vector<BinaryInfo>& binaries,
-    //                                   const std::vector<PackageInfo>& packages,
-    //                                   const std::vector<LargeFileInfo>& largeFiles);
+    static ReportBuilder fromScanners(const std::vector<SecretInfo>& secrets,
+                                      const std::vector<BinariesInfos>& binaries,
+                                      const std::vector<PackageInfo>& packages,
+                                      const std::vector<LargeFileInfo>& largeFiles);
 private:
     std::map<std::string, std::vector<std::string>> sections;
 };

@@ -21,8 +21,8 @@ static bool containsSensitivePackage(const std::string& line, std::string& reaso
     return false;
 }
 
-std::vector<std::string> PackagesScanner::scan(const std::string& rootPath) {
-    std::vector<std::string> findings;
+std::vector<PackageInfo> PackagesScanner::scan(const std::string& rootPath) {
+    std::vector<PackageInfo> findings;
     std::string reason;
 
     // Support de APK (Alpine)
@@ -32,7 +32,10 @@ std::vector<std::string> PackagesScanner::scan(const std::string& rootPath) {
         std::string line;
         while (std::getline(apkFile, line)) {
             if (containsSensitivePackage(line, reason)) {
-                findings.push_back("📦 " + reason);
+                PackageInfo pkg;
+                pkg.name = "📦";
+                pkg.version = reason;
+                findings.push_back(pkg);
             }
         }
     }
@@ -45,7 +48,11 @@ std::vector<std::string> PackagesScanner::scan(const std::string& rootPath) {
         while (std::getline(dpkgFile, line)) {
             if (line.rfind("Package:", 0) == 0) {
                 if (containsSensitivePackage(line, reason)) {
-                    findings.push_back("📦 " + reason);
+                    PackageInfo pkg;
+                    pkg.name = "📦 ";
+                    pkg.version = reason;
+                    
+                    findings.push_back(pkg);
                 }
             }
         }
@@ -54,11 +61,17 @@ std::vector<std::string> PackagesScanner::scan(const std::string& rootPath) {
     // Support de RPM (RedHat/CentOS)
     std::string rpmDb = rootPath + "/var/lib/rpm/Packages";
     if (fs::exists(rpmDb)) {
-        findings.push_back("⚠️ RPM détecté : analyse approfondie non supportée (TODO)");
+        PackageInfo pkg;
+        pkg.name = "📦 RPM détecté";
+        pkg.version = "Analyse approfondie non supportée (TODO)";
+        findings.push_back(pkg);
     }
 
     if (findings.empty()) {
-        findings.push_back("✅ Aucun package problématique détecté.");
+        PackageInfo pkg;
+        pkg.name = "✅";
+        pkg.version = "Aucun package sensible trouvé dans l'image.";
+        findings.push_back(pkg);
     }
 
     return findings;

@@ -4,6 +4,7 @@ FROM debian:bookworm AS builder
 # Préparer les outils
 RUN apt-get update && apt-get install -y \
     build-essential \
+    bash \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

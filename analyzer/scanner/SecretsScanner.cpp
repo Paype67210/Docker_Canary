@@ -20,11 +20,11 @@ static const std::vector<std::regex> suspiciousPatterns = {
     std::regex(R"(secret\s*[:=]\s*\S+)", std::regex::icase)
 };
 
-std::vector<std::string> SecretsScanner::scan(const std::string& rootPath) {
-    std::vector<std::string> results;
+std::vector<SecretInfo> SecretsScanner::scan(const std::string& rootPath) {
+    std::vector<SecretInfo> results;
 
     for (const auto& entry : fs::recursive_directory_iterator(rootPath)) {
-        if (!entry.is_regular_file())
+        if (entry.status().type() != fs::file_type::regular)
             continue;
 
         std::string path = entry.path().string();
@@ -33,7 +33,11 @@ std::vector<std::string> SecretsScanner::scan(const std::string& rootPath) {
         // Détection par nom de fichier
         for (const auto& suspiciousName : suspiciousFilenames) {
             if (filename == suspiciousName) {
-                results.push_back("🕵️ Nom suspect: " + path);
+                SecretInfo info;
+                info.line = "🕵️ Nom suspect";
+                info.path = path;
+                info.content = "Fichier trouvé : " + filename;
+                results.push_back(info);
                 break;
             }
         }
@@ -49,7 +53,11 @@ std::vector<std::string> SecretsScanner::scan(const std::string& rootPath) {
             ++lineNum;
             for (const auto& pattern : suspiciousPatterns) {
                 if (std::regex_search(line, pattern)) {
-                    results.push_back("🔐 Motif suspect: " + path + " (ligne " + std::to_string(lineNum) + ")");
+                    SecretInfo info;
+                    info.line = "🔐 Motif suspect";
+                    info.path = path;
+                    info.content = " (ligne " + std::to_string(lineNum) + ")";
+                    results.push_back(info);
                     break;
                 }
             }

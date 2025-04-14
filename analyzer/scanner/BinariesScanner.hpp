@@ -4,9 +4,15 @@
 #include <vector>
 #include <string>
 
+struct BinariesInfos {
+    std::string path;
+    std::string architecture;
+    bool isStripped;
+};
+
 class BinariesScanner {
 public:
-    static std::vector<std::string> scan(const std::string& rootPath);
+    static std::vector<BinariesInfos> scan(const std::string& rootPath);
 };
 
 #endif

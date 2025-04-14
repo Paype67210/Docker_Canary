@@ -8,7 +8,7 @@
 #include "scanner/SecretsScanner.hpp"
 #include "scanner/BinariesScanner.hpp"
 #include "scanner/PackagesScanner.hpp"
-// #include "scanner/LargesFileScanner.hpp"
+#include "scanner/LargeFilesScanner.hpp"
 #include "utils/TarExtractor.hpp"
 #include "report/ReportBuilder.hpp"
 
@@ -33,36 +33,37 @@ int main(int argc, char** argv) {
     std::string imagePath = argv[1];
     std::string extractDir = "/tmp/docker_canary_extract";
 
+    // Extraire l'image Docker
     std::cout << "🗂️ Extraction de l'image: " << imagePath << std::endl;
     if (!TarExtractor::extract(imagePath, extractDir)) {
         std::cerr << "❌ Erreur d'extraction\n";
         return 2;
     }
-
-    ReportBuilder report;
+    std::cout << "✅ Image extraite dans: " << extractDir << std::endl;
 
     // Lancer le spinner dans un thread séparé
     std::atomic<bool> running(true);
     std::thread spinnerThread(showSpinner, std::ref(running));
 
     // Lancer les analyses
+    std::cout << "🔍 Analyse des secrets...\n";
     auto secrets = SecretsScanner::scan(extractDir);
-    report.addSection("Secrets", secrets);
+    std::cout << "🔍 Analyse des binaires...\n";
     auto binaries = BinariesScanner::scan(extractDir);
-    report.addSection("Binaries", binaries);
+    std::cout << "🔍 Analyse des packages...\n";
     auto packages = PackagesScanner::scan(extractDir);
-    report.addSection("Packages", packages);
+    std::cout << "🔍 Analyse des fichiers volumineux...\n";
+    auto largeFiles = LargeFilesScanner::scan(extractDir);
 
     // Arrêter le spinner
     running = false;
     if (spinnerThread.joinable()) {
         spinnerThread.join();
     }
+    std::cout << "✅ Extraction et analyse terminées.\n";
 
-    std::cout << "🧾 Génération du rapport JSON\n";
-    std::cout << report.toJson(3) << "\n";
-    // auto report = ReportBuilder::build(secrets, binaries, packages, largeFiles);
-    // std::cout << report.dump(4) << std::endl;
+    auto builder = ReportBuilder::fromScanners(secrets, binaries, packages, largeFiles);
+    std::cout << builder.toJson(4) << std::endl;
 
     return 0;
 }

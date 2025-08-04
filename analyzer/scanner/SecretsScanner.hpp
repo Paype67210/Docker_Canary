@@ -3,6 +3,12 @@
 
 #include <vector>
 #include <string>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <regex>
+#include <set>
+#include <sstream>
 
 struct SecretInfo {
     std::string path;

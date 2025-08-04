@@ -1,11 +1,4 @@
 #include "SecretsScanner.hpp"
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <regex>
-#include <set>
-#include <vector>
-#include <sstream>
 
 namespace fs = std::filesystem;
 

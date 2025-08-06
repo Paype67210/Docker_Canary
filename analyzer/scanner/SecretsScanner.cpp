@@ -63,7 +63,7 @@ bool isBinary(const std::string& path) {
 // Vérifie si le chemin doit être exclu du scan
 bool isExcluded(const fs::path& path) {
     for (const auto& part : path) {
-        if (excludedDirs.count(part.string()) > 0) return true;
+        if (excludeDirs.count(part.string()) > 0) return true;
     }
     return false;
 }
@@ -96,8 +96,19 @@ std::vector<SecretInfo> SecretsScanner::scan(const std::string& rootPath) {
             }
         }
 
-        // Détection par regex sur le nom de fichier
-        for (const auto& pattern : suspiciousFilenamePatterns) {
+        // Détection par patterns regex sur le nom de fichier
+        std::vector<std::regex> filenamePatterns = {
+            std::regex(R"(.*\.key$)", std::regex::icase),
+            std::regex(R"(.*\.pem$)", std::regex::icase),
+            std::regex(R"(.*\.p12$)", std::regex::icase),
+            std::regex(R"(.*\.pfx$)", std::regex::icase),
+            std::regex(R"(.*_rsa$)", std::regex::icase),
+            std::regex(R"(.*_dsa$)", std::regex::icase),
+            std::regex(R"(.*password.*)", std::regex::icase),
+            std::regex(R"(.*secret.*)", std::regex::icase)
+        };
+        
+        for (const auto& pattern : filenamePatterns) {
             if (std::regex_search(filename, pattern)) {
                 SecretInfo info;
                 info.line = "🕵️ Pattern suspect sur le nom";
